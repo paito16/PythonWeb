@@ -33,9 +33,11 @@ jobs:
                 username: ${{ secrets.EC2_SSH_USER }}
                 key: ${{ secrets.EC2_SSH_KEY }}
                 script: |
-                  # Actualiza el sistema e instala Docker si no está instalado
-                  sudo yum update -y
-                  sudo yum install -y docker
+                  # Actualiza el sistema e instala Docker en sistemas basados en apt
+                  sudo apt-get update -y
+                  sudo apt-get install -y docker.io
+
+                  # Inicia y habilita Docker
                   sudo systemctl start docker
                   sudo systemctl enable docker
 
@@ -55,10 +57,10 @@ jobs:
                   fi
 
                   # Descarga la última imagen desde Docker Hub
-                  sudo docker pull your-dockerhub-username/your-image-name:latest
+                  sudo docker pull paito16/helloworldpython:latest
 
                   # Inicia un nuevo contenedor con la imagen descargada
-                  sudo docker run -d -p 3000:3000 --name HelloWorld your-dockerhub-username/your-image-name:latest
+                  sudo docker run -d -p 3000:3000 --name HelloWorld paito16/helloworldpython:latest
 
                   # Lista los contenedores activos para verificar
                   sudo docker ps

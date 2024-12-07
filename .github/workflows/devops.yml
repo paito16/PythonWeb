@@ -25,3 +25,40 @@ jobs:
                 context: .
                 push: true
                 tags: paito16/helloworldpython:latest
+
+            - name: Deploy to EC2
+              uses: appleboy/ssh-action@v0.1.6
+              with:
+                host: ${{ secrets.EC2_HOST }}
+                username: ${{ secrets.EC2_SSH_USER }}
+                key: ${{ secrets.EC2_SSH_KEY }}
+                script: |
+                  # Actualiza el sistema e instala Docker si no está instalado
+                  sudo yum update -y
+                  sudo yum install -y docker
+                  sudo systemctl start docker
+                  sudo systemctl enable docker
+
+                  # Detiene cualquier contenedor que esté usando el puerto 3000
+                  if sudo lsof -i :3000; then
+                    echo "El puerto 3000 está en uso. Deteniendo el servicio asociado..."
+                    sudo docker ps -q --filter "publish=3000" | grep -q . && \
+                    sudo docker stop $(sudo docker ps -q --filter "publish=3000") && \
+                    sudo docker rm $(sudo docker ps -q --filter "publish=3000")
+                  fi
+
+                  # Elimina cualquier contenedor anterior llamado "HelloWorld"
+                  if [ "$(sudo docker ps -aq -f name=HelloWorld)" ]; then
+                    echo "Eliminando contenedor existente..."
+                    sudo docker stop HelloWorld || true
+                    sudo docker rm HelloWorld || true
+                  fi
+
+                  # Descarga la última imagen desde Docker Hub
+                  sudo docker pull your-dockerhub-username/your-image-name:latest
+
+                  # Inicia un nuevo contenedor con la imagen descargada
+                  sudo docker run -d -p 3000:3000 --name HelloWorld your-dockerhub-username/your-image-name:latest
+
+                  # Lista los contenedores activos para verificar
+                  sudo docker ps

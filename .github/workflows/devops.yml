@@ -41,12 +41,12 @@ jobs:
                   sudo systemctl start docker
                   sudo systemctl enable docker
 
-                  # Detiene cualquier contenedor que esté usando el puerto 3000
-                  if sudo lsof -i :3000; then
-                    echo "El puerto 3000 está en uso. Deteniendo el servicio asociado..."
-                    sudo docker ps -q --filter "publish=3000" | grep -q . && \
-                    sudo docker stop $(sudo docker ps -q --filter "publish=3000") && \
-                    sudo docker rm $(sudo docker ps -q --filter "publish=3000")
+                  # Detiene cualquier contenedor que esté usando el puerto 5000
+                  if sudo lsof -i :5000; then
+                    echo "El puerto 5000 está en uso. Deteniendo el servicio asociado..."
+                    sudo docker ps -q --filter "publish=5000" | grep -q . && \
+                    sudo docker stop $(sudo docker ps -q --filter "publish=5000") && \
+                    sudo docker rm $(sudo docker ps -q --filter "publish=5000")
                   fi
 
                   # Elimina cualquier contenedor anterior llamado "HelloWorld"
@@ -60,7 +60,7 @@ jobs:
                   sudo docker pull paito16/helloworldpython:latest
 
                   # Inicia un nuevo contenedor con la imagen descargada
-                  sudo docker run -d -p 3000:3000 --name HelloWorld paito16/helloworldpython:latest
+                  sudo docker run -d -p 5000:5000 --name HelloWorld paito16/helloworldpython:latest
 
                   # Lista los contenedores activos para verificar
                   sudo docker ps
